@@ -4,7 +4,6 @@ const app = express();
 const session = require("express-session");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const MongoStore = require("connect-mongo");
 const mongoMiddleware = require("./middleware/mongoMiddleware");
 const port = process.env.PORT || 8000;
 
@@ -17,11 +16,6 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URL,
-      ttl: 24 * 60 * 60,
-    }),
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
   })
 );
 
