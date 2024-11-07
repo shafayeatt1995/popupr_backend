@@ -165,19 +165,17 @@ const controller = {
     try {
       console.log(req.query);
       const { domain } = req.query;
-      const domainData = await Domain.findOne({ domain }).select({
+      const dd = await Domain.findOne({ domain }).select({
         hide: 1,
         messages: 1,
         send: 1,
         start: 1,
         _id: 0,
       });
-      res.set("X-Domain-Data", JSON.stringify(domainData));
 
-      return res.json({ domainData });
+      return res.json({ dd });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json(parseError(error));
+      return res.status(200).json({ dd: [] });
     }
   },
 };
