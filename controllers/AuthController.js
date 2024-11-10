@@ -37,6 +37,7 @@ const controller = {
       return res.status(500).json({ message });
     }
   },
+
   async socialLogin(req, res) {
     try {
       delete req.user;
