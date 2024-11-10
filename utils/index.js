@@ -3,9 +3,12 @@ const axios = require("axios");
 const sharp = require("sharp");
 const { ObjectId } = mongoose.Types;
 const { UTApi } = require("uploadthing/server");
+const { Paddle, Environment } = require("@paddle/paddle-node-sdk");
 
 const utils = {
   utapi: new UTApi(),
+
+  isDev: process.env.ENVIRONMENT === "development",
 
   message: "Internal server error",
 
@@ -166,33 +169,11 @@ const utils = {
     return data;
   },
 
-  async createPaymentUrl({
-    user_email,
-    product_id,
-    return_url,
-    cancel_url,
-    data,
-  }) {
-    try {
-      const response = await axios.post(
-        "https://vendors.paddle.com/api/2.0/checkout/create",
-        {
-          vendor_id: process.env.PADDLE_VENDOR_ID,
-          vendor_auth_code: process.env.PADDLE_VENDOR_CODE,
-          product_id,
-          email: user_email,
-          quantity: 1,
-          return_url,
-          cancel_url,
-          custom: { user_email, data },
-        }
-      );
-
-      console.log(response.data);
-      return response.data.url; // The payment URL
-    } catch (error) {
-      console.error("Error creating payment link:", error);
-    }
+  paddle() {
+    const { isDev } = utils;
+    return new Paddle(process.env.PADDLE_API_KEY, {
+      environment: isDev ? Environment.sandbox : Environment.production,
+    });
   },
 };
 

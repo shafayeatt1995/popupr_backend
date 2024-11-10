@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const express = require("express");
 const isAuthenticated = require("../middleware/isAuthenticated");
 const router = express.Router();

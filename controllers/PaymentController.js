@@ -1,37 +1,33 @@
-const { parseError, sendError } = require("../utils");
-const { Environment, Paddle } = require("@paddle/paddle-node-sdk");
+const { parseError, sendError, message, isDev, paddle } = require("../utils");
 
 const controller = {
   async generatePaymentUrl(req, res) {
     try {
-      const paddle = new Paddle(process.env.PADDLE_API_KEY, {
-        environment: Environment.sandbox,
-        logLevel: "verbose",
-      });
+      const {
+        PADDLE_PRODUCT_ID,
+        PADDLE_PRICE_APPETIZER,
+        PADDLE_PRICE_MAIN_COURSE,
+        PADDLE_DISCOUNT_APPETIZER,
+        PADDLE_DISCOUNT_MAIN_COURSE,
+      } = process.env;
 
-      const { _id, email } = req.user;
-      const { productID } = req.body;
-
-      const product = await paddle.products.get(productID);
-
-      if (product && product.status === "active") {
-        const prices = [
-          {
-            productID: "pro_01jc02z8mq6tg0pjby94xb1ewd",
-            priceID: "pri_01jc030me2qnyrjqe1b0v1ppsn	",
-            name: "main",
-          },
-          {
-            productID: "pro_01jbzyy1werp4r2kyq99kftwr6",
-            priceID: "pri_01jbzz22kv0q1aacz3tdpvqhb1	",
-            name: "basic",
-          },
-        ];
-        const priceData = prices.find((val) => val.productID === productID);
-        return res.json({ priceData: priceData || false });
+      const products = await paddle.products.get(PADDLE_PRODUCT_ID);
+      if (products && products.status === "active") {
+        const { productName } = req.body;
+        let priceID;
+        let discountID;
+        if (productName === "main_course") {
+          priceID = PADDLE_PRICE_MAIN_COURSE;
+          discountID = PADDLE_DISCOUNT_MAIN_COURSE;
+        } else {
+          priceID = PADDLE_PRICE_APPETIZER;
+          discountID = PADDLE_DISCOUNT_APPETIZER;
+        }
+        return res.json({ priceID, discountID });
       } else {
-        sendError({ toast: "Something wrong" });
+        sendError({ toast: message });
       }
+      return res.json({ priceData: false });
     } catch (error) {
       console.error(error);
       return res.status(500).json(parseError(error));

@@ -163,7 +163,6 @@ const controller = {
   },
   async domainMessages(req, res) {
     try {
-      console.log(req.query);
       const { domain } = req.query;
       const dd = await Domain.findOne({ domain }).select({
         hide: 1,
