@@ -1,5 +1,6 @@
 const express = require("express");
 const { isDev, paddle } = require("../utils");
+const { Environment, Paddle } = require("@paddle/paddle-node-sdk");
 const router = express.Router();
 
 const allowedIps = isDev
@@ -38,6 +39,10 @@ router.post(
     const secretKey = process.env.PADDLE_WEBHOOK_SECRET;
 
     try {
+      const paddle = new Paddle(process.env.PADDLE_API_KEY, {
+        environment: isDev ? Environment.sandbox : Environment.production,
+      });
+
       if (signature && rawRequestBody) {
         const eventData = paddle.webhooks.unmarshal(
           rawRequestBody,

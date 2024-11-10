@@ -3,7 +3,6 @@ const axios = require("axios");
 const sharp = require("sharp");
 const { ObjectId } = mongoose.Types;
 const { UTApi } = require("uploadthing/server");
-const { Paddle, Environment } = require("@paddle/paddle-node-sdk");
 
 const utils = {
   utapi: new UTApi(),
@@ -167,13 +166,6 @@ const utils = {
       Object.assign(new Blob([processedBuffer.data]), { name: filename })
     );
     return data;
-  },
-
-  paddle() {
-    const { isDev } = utils;
-    return new Paddle(process.env.PADDLE_API_KEY, {
-      environment: isDev ? Environment.sandbox : Environment.production,
-    });
   },
 };
 

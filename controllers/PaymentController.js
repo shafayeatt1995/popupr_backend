@@ -1,15 +1,21 @@
+const { Paddle, Environment } = require("@paddle/paddle-node-sdk");
 const { parseError, sendError, message, isDev, paddle } = require("../utils");
 
 const controller = {
   async generatePaymentUrl(req, res) {
     try {
       const {
+        PADDLE_API_KEY,
         PADDLE_PRODUCT_ID,
         PADDLE_PRICE_APPETIZER,
         PADDLE_PRICE_MAIN_COURSE,
         PADDLE_DISCOUNT_APPETIZER,
         PADDLE_DISCOUNT_MAIN_COURSE,
       } = process.env;
+
+      const paddle = new Paddle(PADDLE_API_KEY, {
+        environment: isDev ? Environment.sandbox : Environment.production,
+      });
 
       const products = await paddle.products.get(PADDLE_PRODUCT_ID);
       if (products && products.status === "active") {
