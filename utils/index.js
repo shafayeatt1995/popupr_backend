@@ -7,7 +7,7 @@ const { UTApi } = require("uploadthing/server");
 const utils = {
   utapi: new UTApi(),
 
-  isDev: process.env.ENVIRONMENT === "development",
+  isDev: true, //process.env.ENVIRONMENT === "development",
 
   message: "Internal server error",
 
