@@ -23,8 +23,8 @@ app.use(
 app.get("/", (req, res) => {
   res.json({ message: "Hello world" });
 });
-app.use("/", mongoMiddleware, require("./routes"));
 app.use("/webhook", mongoMiddleware, require("./routes/webhook"));
+app.use("/", mongoMiddleware, require("./routes"));
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`> Server listening at http://localhost:${port}`);
