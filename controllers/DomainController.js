@@ -73,7 +73,9 @@ const controller = {
         domain = domain
           .replace(/^(https?:\/\/)?(www\.)?/, "")
           .toLowerCase()
-          .trim();
+          .trim()
+          .replace(/\/$/, "");
+
         const domainRegex = /^(?!-)([A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,}$/;
         if (!domainRegex.test(domain)) {
           sendError({ toast: "Invalid domain name" });

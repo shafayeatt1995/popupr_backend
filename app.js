@@ -8,17 +8,8 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 8000;
-const origin =
-  process.env.ENVIRONMENT === "development"
-    ? "http://localhost:8080"
-    : "https://popupr.com";
 
-app.use(
-  cors({
-    origin,
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(cookieParser());
 app.use(
   session({
