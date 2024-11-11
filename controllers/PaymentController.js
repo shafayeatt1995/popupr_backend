@@ -17,9 +17,11 @@ const controller = {
         if (productName === "main_course") {
           priceID = PADDLE_PRICE_MAIN_COURSE;
           discountID = PADDLE_DISCOUNT_MAIN_COURSE;
+          popupr_pac = "main_course";
         } else {
           priceID = PADDLE_PRICE_APPETIZER;
           discountID = PADDLE_DISCOUNT_APPETIZER;
+          popupr_pac = "appetizer";
         }
         return res.json({ priceID, discountID });
       } else {

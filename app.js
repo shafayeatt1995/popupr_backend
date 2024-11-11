@@ -1,16 +1,24 @@
-require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
 const mongoMiddleware = require("./middleware/mongoMiddleware");
+require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 8000;
+const origin =
+  process.env.ENVIRONMENT === "development"
+    ? "http://localhost:8080"
+    : "https://popupr.com";
 
-app.use(cors());
-app.use(express.json());
+app.use(
+  cors({
+    origin,
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(
   session({
@@ -22,8 +30,9 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => res.json({ message: "Hello world" }));
 app.use("/webhook", mongoMiddleware, require("./routes/webhook"));
+app.use(express.json());
+app.get("/", (req, res) => res.json({ message: "Hello world" }));
 app.use("/", mongoMiddleware, require("./routes"));
 
 app.listen(port, () =>

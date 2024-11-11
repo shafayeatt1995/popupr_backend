@@ -1,8 +1,11 @@
 const express = require("express");
-const { isDev, paddle } = require("../utils");
-const { Environment, Paddle } = require("@paddle/paddle-node-sdk");
-const router = express.Router();
+const mongoose = require("mongoose");
+const { isDev } = require("../utils");
+const { Paddle, EventName } = require("@paddle/paddle-node-sdk");
+const { Subscription, User } = require("../models");
+const app = express();
 
+const paddle = new Paddle(process.env.PADDLE_API_KEY);
 const allowedIps = isDev
   ? [
       "34.194.127.46",
@@ -21,7 +24,7 @@ const allowedIps = isDev
       "34.212.5.7",
     ];
 
-router.use((req, res, next) => {
+app.use((req, res, next) => {
   const allow = allowedIps.includes(
     req.headers["x-forwarded-for"] || req.connection.remoteAddress
   );
@@ -30,46 +33,73 @@ router.use((req, res, next) => {
   return res.status(403).send("Forbidden: IP not allowed");
 });
 
-router.post(
+app.post(
   "/popupr-purchase",
   express.raw({ type: "application/json" }),
   async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     const signature = req.headers["paddle-signature"] || "";
     const rawRequestBody = req.body.toString();
-    const secretKey = process.env.PADDLE_WEBHOOK_SECRET;
+    const secretKey = process.env.PADDLE_WEBHOOK_SECRET || "";
 
     try {
-      const paddle = new Paddle(process.env.PADDLE_API_KEY, {
-        environment: isDev ? Environment.sandbox : Environment.production,
-      });
-
       if (signature && rawRequestBody) {
-        const eventData = paddle.webhooks.unmarshal(
+        const eventData = await paddle.webhooks.unmarshal(
           rawRequestBody,
           secretKey,
           signature
         );
-        console.log(eventData);
         switch (eventData.eventType) {
-          case EventName.ProductUpdated:
-            console.log(`Product ${eventData.data.id} was updated`);
-            break;
-          case EventName.SubscriptionUpdated:
-            console.log(`Subscription ${eventData.data.id} was updated`);
+          case EventName.TransactionCompleted:
+            const { id, status, customData, payments } = eventData?.data;
+            if (customData && status === "completed") {
+              const { user, popupr_pac } = customData;
+              const { amount, methodDetails } = payments[0];
+              await Promise.all(
+                await Subscription.create(
+                  [
+                    {
+                      userID: user._id,
+                      transactionID: id,
+                      paymentDetails: methodDetails,
+                      package: popupr_pac,
+                      amount: amount / 100,
+                    },
+                  ],
+                  { session }
+                ),
+                await User.updateOne(
+                  { _id: user._id },
+                  {
+                    power:
+                      popupr_pac === "main_course"
+                        ? 20
+                        : popupr_pac === "appetizer"
+                        ? 10
+                        : 1,
+                  },
+                  { session }
+                )
+              );
+            }
             break;
           default:
             console.log(eventData.eventType);
         }
-        res.send("Paddle webhook received and verified");
       } else {
         console.log("Signature missing in header");
-        res.status(400).send("Bad Request: Signature missing");
       }
-    } catch (error) {
-      console.error("Error processing webhook:", error);
-      res.status(500).send("Error handling webhook");
+      await session.commitTransaction();
+      await session.endSession();
+      res.send("Processed webhook event");
+    } catch (e) {
+      console.log(e);
+      await session.abortTransaction();
+      await session.endSession();
+      res.status(500).send("Failed to processed webhook event");
     }
   }
 );
 
-module.exports = router;
+module.exports = app;
