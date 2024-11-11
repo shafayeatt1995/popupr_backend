@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const axios = require("axios");
 const sharp = require("sharp");
 const { ObjectId } = mongoose.Types;
 const { UTApi } = require("uploadthing/server");
