@@ -23,7 +23,7 @@ const controller = {
           discountID = PADDLE_DISCOUNT_APPETIZER;
           popupr_pac = "appetizer";
         }
-        return res.json({ priceID, discountID });
+        return res.json({ priceID, discountID, popupr_pac });
       } else {
         sendError({ toast: message });
       }
