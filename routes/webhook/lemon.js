@@ -10,7 +10,6 @@ app.post(
   express.raw({ type: "application/json" }),
   lemonMiddleware,
   async (req, res) => {
-    console.log("ami anik");
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -19,7 +18,6 @@ app.post(
 
       if (custom_data && event_name === "order_created") {
         const { userID, popuprPac } = custom_data;
-        console.log(meta);
         const { status, user_name, user_email, order_number, total_usd } =
           data.attributes;
         const methodDetails = { status, user_name, user_email };
@@ -56,7 +54,7 @@ app.post(
 
       return res.send("Processed webhook event");
     } catch (e) {
-      console.log(e);
+      console.error(e);
       await session.abortTransaction();
       await session.endSession();
       return res.status(500).send("Failed to processed webhook event");

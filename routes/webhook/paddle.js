@@ -29,7 +29,6 @@ app.use((req, res, next) => {
     req.headers["x-forwarded-for"] || req.connection.remoteAddress
   );
   if (allow) return next();
-  console.log("Forbidden: IP not allowed");
   return res.status(403).send("Forbidden: IP not allowed");
 });
 
@@ -85,16 +84,13 @@ app.post(
             }
             break;
           default:
-            console.log(eventData.eventType);
         }
-      } else {
-        console.log("Signature missing in header");
       }
       await session.commitTransaction();
       await session.endSession();
       res.send("Processed webhook event");
     } catch (e) {
-      console.log(e);
+      console.error(e);
       await session.abortTransaction();
       await session.endSession();
       res.status(500).send("Failed to processed webhook event");

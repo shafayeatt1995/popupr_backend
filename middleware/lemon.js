@@ -15,7 +15,7 @@ const lemonMiddleware = (req, res, next) => {
     req.parseSignature = parseSignature;
     next();
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(403).send("Invalid Signature");
   }
 };
