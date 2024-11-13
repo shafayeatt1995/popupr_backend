@@ -5,25 +5,32 @@ const controller = {
     try {
       const { productName } = req.body;
       if (productName) {
+        const package = {};
         const {
           PADDLE_PRICE_APPETIZER,
           PADDLE_PRICE_MAIN_COURSE,
           PADDLE_DISCOUNT_APPETIZER,
           PADDLE_DISCOUNT_MAIN_COURSE,
+          LEMON_APPETIZER,
+          LEMON_MAIN_COURSE,
+          LEMON_APPETIZER_DISCOUNT,
+          LEMON_MAIN_COURSE_DISCOUNT,
         } = process.env;
 
-        let priceID;
-        let discountID;
         if (productName === "main_course") {
-          priceID = PADDLE_PRICE_MAIN_COURSE;
-          discountID = PADDLE_DISCOUNT_MAIN_COURSE;
-          popupr_pac = "main_course";
+          // package.priceID = PADDLE_PRICE_MAIN_COURSE;
+          // package.discountID = PADDLE_DISCOUNT_MAIN_COURSE;
+          package.popupr_pac = "main_course";
+          package.url = LEMON_MAIN_COURSE;
+          package.discountCode = LEMON_MAIN_COURSE_DISCOUNT;
         } else {
-          priceID = PADDLE_PRICE_APPETIZER;
-          discountID = PADDLE_DISCOUNT_APPETIZER;
-          popupr_pac = "appetizer";
+          // package.priceID = PADDLE_PRICE_APPETIZER;
+          // package.discountID = PADDLE_DISCOUNT_APPETIZER;
+          package.popupr_pac = "appetizer";
+          package.url = LEMON_APPETIZER;
+          package.discountCode = LEMON_APPETIZER_DISCOUNT;
         }
-        return res.json({ priceID, discountID, popupr_pac });
+        return res.json(package);
       } else {
         sendError({ toast: message });
       }

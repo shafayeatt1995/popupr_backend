@@ -5,9 +5,10 @@ const SubscriptionSchema = new Schema(
   {
     userID: { type: Schema.Types.ObjectId, required: true },
     transactionID: { type: String, required: true },
-    paymentDetails: { type: Object, required: true },
+    paymentDetails: { type: Object },
     package: { type: String, required: true },
     amount: { type: Number, required: true },
+    refunded: { type: Boolean, default: false },
   },
   {
     strict: true,

@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { isDev } = require("../utils");
+const { isDev } = require("../../utils");
 const { Paddle, EventName } = require("@paddle/paddle-node-sdk");
-const { Subscription, User } = require("../models");
+const { Subscription, User } = require("../../models");
 const app = express();
 
 const paddle = new Paddle(process.env.PADDLE_API_KEY);

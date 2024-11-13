@@ -19,10 +19,10 @@ const controller = {
 
       if (power === 420 && type === "admin") {
         payload.isAdmin = true;
-      } else if (power === 10 && type === "user") {
-        payload.isBasicUser = true;
       } else if (power === 20 && type === "user") {
         payload.isAdvUser = true;
+      } else if (power === 10 && type === "user") {
+        payload.isBasicUser = true;
       } else if (power === 1 && type === "user") {
         payload.isFreeUser = true;
       }
