@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { lemonMiddleware } = require("../../middleware/lemon");
-const { isDev } = require("../../utils");
 const { Subscription, User } = require("../../models");
 const app = express();
 
