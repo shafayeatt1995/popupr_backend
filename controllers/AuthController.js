@@ -37,7 +37,47 @@ const controller = {
       return res.status(500).json({ message });
     }
   },
+  async refreshToken(req, res) {
+    try {
+      const { token: oldToken } = req.body;
+      const validateToken = jwt.verify(oldToken, process.env.AUTH_SECRET);
+      if (!validateToken) throw new Error(`token isn't valid`);
+      const user = await User.findOne({ _id: validateToken._id }).select(
+        "+power"
+      );
+      const { _id, name, email, power, avatar, type, socialAccount, provider } =
+        user;
 
+      const payload = {
+        _id,
+        name,
+        email,
+        avatar,
+        type,
+        socialAccount,
+        provider,
+      };
+
+      if (power === 420 && type === "admin") {
+        payload.isAdmin = true;
+      } else if (power === 20 && type === "user") {
+        payload.isAdvUser = true;
+      } else if (power === 10 && type === "user") {
+        payload.isBasicUser = true;
+      } else if (power === 1 && type === "user") {
+        payload.isFreeUser = true;
+      }
+
+      const token = jwt.sign(payload, process.env.AUTH_SECRET, {
+        expiresIn: "7 days",
+      });
+
+      res.json({ user: payload, token });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message });
+    }
+  },
   async socialLogin(req, res) {
     try {
       delete req.user;

@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { login, socialLogin } = require("../controllers/AuthController");
+const {
+  login,
+  socialLogin,
+  refreshToken,
+} = require("../controllers/AuthController");
 const { loginValidation } = require("../validation/auth");
 const { validation } = require("../validation");
 const passport = require("passport");
@@ -11,6 +15,7 @@ router.use(passport.initialize());
 router.use(passport.session());
 
 router.post("/login", loginValidation, validation, login);
+router.post("/refresh-token", refreshToken);
 router.get(
   "/social-login/google",
   passport.authenticate("google", { scope: ["email", "profile"] })
