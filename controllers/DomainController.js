@@ -6,7 +6,7 @@ const {
   paginate,
   objectID,
   tryFetch,
-  uploadBaseImage,
+  uploadImage,
   utapi,
 } = require("../utils");
 
@@ -117,17 +117,20 @@ const controller = {
   async updateMessage(req, res) {
     try {
       const { _id: userID } = req.user;
-      const { _id, messages, deleteList } = req.body;
+      let { _id, messages, deleteList } = req.body;
+
+      deleteList = JSON.parse(deleteList);
+      messages = JSON.parse(messages);
 
       if (deleteList.length > 0) await utapi.deleteFiles(deleteList);
 
       const newMessages = await Promise.all(
-        messages.map(async (msg) => {
-          const isBase64 =
-            msg.image.startsWith("data:image/") &&
-            /^data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+$/.test(msg.image);
-          if (msg.key && isBase64) await utapi.deleteFiles([msg.key]);
-          const uploadData = isBase64 ? await uploadBaseImage(msg.image) : null;
+        messages.map(async (msg, i) => {
+          const imageFile = req.files ? req?.files[i]?.data || null : null;
+          if (msg.key && imageFile) {
+            await utapi.deleteFiles([msg.key]);
+          }
+          const uploadData = imageFile ? await uploadImage(imageFile) : null;
           return {
             title: msg.title,
             message: msg.message,

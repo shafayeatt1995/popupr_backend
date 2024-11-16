@@ -147,10 +147,9 @@ const utils = {
     throw new Error("All retry attempts failed");
   },
 
-  async uploadBaseImage(base64Image, width = 150, height = 150) {
+  async uploadImage(image, width = 150, height = 150) {
     const { randomKey, utapi } = utils;
-    const imageBuffer = Buffer.from(base64Image.split(",")[1], "base64");
-    const processedBuffer = await sharp(imageBuffer)
+    const processedBuffer = await sharp(image)
       .resize({
         width,
         height,
